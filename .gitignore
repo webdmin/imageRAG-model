@@ -210,7 +210,6 @@ pdfs/static/images/
 # IDE settings
 pdfs/
 uploads/
-data_admin.py/
 db_utils.py/
 image_metadata.json
 ingestion_checkpoint.json
