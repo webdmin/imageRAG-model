@@ -219,7 +219,9 @@ map_bot.log
 road_data.json
 sample.txt
 service-account-key.json
-
+data_admin.py
+db_utils.py
+processed_files.pkl
 .vscode/
 .idea/
 *.swp
