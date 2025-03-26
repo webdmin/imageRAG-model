@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atrip Chatbot Interface</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        :root {
+            --primary-color: #5E35B1;
+            --secondary-color: #F5F5F5;
+            --text-color: #333;
+            --light-gray: #E0E0E0;
+            --dark-gray: #757575;
+            --border-radius: 12px;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #FAFAFA;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chat-container {
+            width: 100%;
+            height: 100vh;
+            background: white;
+            display: flex;
+            flex-direction: row;
+            box-shadow: none;
+            overflow: hidden;
+        }
+        
+        .message-content .section-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--light-gray);
+            padding-bottom: 5px;
+        }
+
+        .message-content .section-subtitle {
+            font-weight: 500;
+            font-size: 1rem;
+            margin-top: 16px;
+            margin-bottom: 8px;
+            color: var(--dark-gray);
+        }
+
+        .message-content .section-content {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            padding-left: 10px;
+        }
+
+        .message-content .procedural-list {
+            padding-left: 24px;
+            margin-bottom: 16px;
+            list-style-type: decimal;
+        }
+
+        .message-content .procedural-list li {
+            margin-bottom: 8px;
+            line-height: 1.7;
+            padding-left: 10px;
+        }
+
+        .message-content .procedural-list li ul {
+            padding-left: 24px;
+            list-style-type: disc;
+            margin-top: 8px;
+        }
+
+        .message-content .procedural-list li ul li {
+            margin-bottom: 4px;
+        }
+
+        .message-content .follow-up-suggestions {
+            margin-top: 24px;
+            margin-bottom: 16px;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .message-content .follow-up-suggestions .section-title {
+            margin-top: 0;
+        }
+
+        .message-content .follow-up-suggestions ul {
+            padding-left: 24px;
+            list-style-type: disc;
+        }
+
+        .message-content .follow-up-suggestions li {
+            margin-bottom: 8px;
+            line-height: 1.7;
+        }
+
+        .message-content p {
+            margin-bottom: 16px;
+        }
+
+        .message-content > div:not(:last-child) {
+            margin-bottom: 24px;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #f8f9fa;
+            border-right: 1px solid #EEEEEE;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #EEEEEE;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 10px 0;
+        }
+
+        .sidebar-menu li {
+            margin: 5px 0;
+        }
+
+        .sidebar-menu button {
+            width: 100%;
+            text-align: left;
+            background: none;
+            color: var(--text-color);
+            padding: 12px 20px;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+        }
+
+        .sidebar-menu button:hover {
+            background-color: #e9ecef;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .chat-header {
+            padding: 15px 20px;
+            background-color: white;
+            border-bottom: 1px solid #EEEEEE;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .chat-header .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+        }
+        
+        .chat-header .avatar i { color: white; font-size: 20px; }
+        
+        .chat-header h1 { font-size: 1.5rem; font-weight: 600; margin: 0; }
+        
+        .chat-header .controls { display: flex; align-items: center; gap: 10px; }
+        
+        .chat-header button { margin-left: 10px; }
+        
+        .chat-box {
+            flex: 1;
+            padding: 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            scroll-behavior: smooth;
+        }
+        
+        .message-wrapper { width: 100%; padding: 20px 30px; }
+        
+        .message-wrapper:nth-child(odd) { background-color: #F9F9F9; }
+        
+        .message {
+            max-width: 90%;
+            margin: 0 auto;
+            word-wrap: break-word;
+            font-size: 16px;
+            line-height: 1.7;
+            position: relative;
+        }
+        
+        .user-message, .bot-message { display: flex; align-items: flex-start; }
+        
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            margin-right: 16px;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .user-avatar { background-color: #2196F3; color: white; }
+        
+        .bot-avatar { background-color: var(--primary-color); color: white; }
+        
+        .message-content { flex: 1; }
+        
+        .message-content p { margin-bottom: 16px; }
+        
+        .message-content p:last-child { margin-bottom: 0; }
+        
+        .message-content h1, h2, h3, h4 {
+            margin-top: 24px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+        
+        .message-content h1 { font-size: 1.75rem; }
+        .message-content h2 { font-size: 1.5rem; }
+        .message-content h3 { font-size: 1.25rem; }
+        
+        .message-content ul, .message-content ol { padding-left: 24px; margin-bottom: 16px; }
+        
+        .message-content li { margin-bottom: 8px; }
+        
+        .message-content code {
+            background-color: #F5F5F5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.9em;
+        }
+        
+        .message-content pre {
+            background-color: #F5F5F5;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 16px;
+        }
+        
+        .message-content pre code {
+            background-color: transparent;
+            padding: 0;
+            border-radius: 0;
+            font-size: 0.9em;
+        }
+        
+        .image-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .image-container img {
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            transition: transform 0.2s;
+        }
+
+        .image-container img:hover {
+            transform: scale(1.05);
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 10px 20px;
+            border-top: 1px solid #EEEEEE;
+            background: white;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+            align-items: center;
+        }
+        
+        .input-container {
+            display: flex;
+            flex: 1;
+            background: var(--secondary-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-right: 10px;
+        }
+        
+        #user-input {
+            flex: 1;
+            padding: 16px 20px;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 16px;
+            resize: none;
+            max-height: 200px;
+            min-height: 50px;
+            overflow-y: auto;
+            line-height: 1.5;
+        }
+        
+        button {
+            border: none;
+            background: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+            padding: 0 20px;
+            height: 50px;
+        }
+        
+        button:hover { background-color: #4527A0; }
+        
+        .send-button { width: 50px; border-radius: 50%; margin-left: 10px; }
+        
+        .file-upload {
+            margin-right: 10px;
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        
+        .file-upload input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .typing-indicator {
+            display: none;
+            padding: 20px 30px;
+            background: #F9F9F9;
+        }
+        
+        .typing-indicator .message { display: flex; align-items: center; }
+        
+        .typing-animation { display: flex; margin-left: 16px; }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--dark-gray);
+            border-radius: 50%;
+            margin: 0 3px;
+            opacity: 0.5;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typingAnimation {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        strong, b { font-weight: 600; }
+        
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background-color: rgba(0, 0, 0, 0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background-color: rgba(0, 0, 0, 0.3); }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 2% auto;
+            padding: 30px;
+            border: 1px solid #888;
+            width: 95%;
+            max-width: 1400px;
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        
+        .modal-header {
+            border-bottom: 2px solid #EEEEEE;
+            padding-bottom: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .modal-header h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin: 0;
+            line-height: 1.4;
+        }
+        
+        .close {
+            color: #aaa;
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .close:hover, .close:focus {
+            color: var(--primary-color);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .modal-actions {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        #pdf-search-input, #history-search-input, #conversation-search-input {
+            padding: 15px 20px;
+            border: 1px solid #E0E0E0;
+            border-radius: 12px;
+            font-size: 18px;
+            width: 300px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        #pdf-search-input:focus, #history-search-input:focus, #conversation-search-input:focus {
+            border-color: var(--primary-color);
+        }
+        
+        .pdf-list, .history-list, .conversation-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 25px;
+            max-height: 70vh;
+            overflow-y: auto;
+            background-color: var(--secondary-color);
+            border-radius: 12px;
+            border: 1px solid #EEEEEE;
+        }
+        
+        .pdf-list li, .history-list li, .conversation-list li {
+            margin: 20px 0;
+            padding: 25px;
+            background-color: white;
+            border-radius: 12px;
+            border: 1px solid #E0E0E0;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            -webkit-hyphens: auto;
+            -ms-hyphens: auto;
+            hyphens: auto;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s, transform 0.2s;
+            font-size: 18px;
+        }
+        
+        .pdf-list li:hover, .history-list li:hover, .conversation-list li:hover {
+            background-color: #F9F9F9;
+            transform: translateY(-3px);
+        }
+        
+        .pdf-list a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 18px;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            -webkit-hyphens: auto;
+            -ms-hyphens: auto;
+            hyphens: auto;
+            display: block;
+            max-width: 100%;
+        }
+        
+        .pdf-list a:hover { text-decoration: underline; }
+        
+        .history-list li.user { background-color: #E3F2FD; }
+        .history-list li.assistant { background-color: #F3E5F5; }
+        .conversation-list li { cursor: pointer; }
+        
+        #pagination, #pdf-pagination, #history-pagination, #conversation-pagination {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        #pagination button, #pdf-pagination button, #history-pagination button, #conversation-pagination button {
+            background: var(--secondary-color);
+            color: #2196F3;
+            border: 1px solid #E0E0E0;
+            padding: 12px 25px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        
+        #pagination button:hover, #pdf-pagination button:hover, #history-pagination button:hover, #conversation-pagination button:hover {
+            background-color: #D7D7D7;
+            transform: scale(1.05);
+        }
+        
+        #pagination button:disabled, #pdf-pagination button:disabled, #history-pagination button:disabled, #conversation-pagination button:disabled {
+            background-color: #F5F5F5;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .modal-actions button {
+            background: var(--primary-color);
+            padding: 15px 30px;
+            border-radius: 12px;
+            color: white;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        
+        .modal-actions button:hover {
+            background-color: #4527A0;
+            transform: scale(1.05);
+        }
+
+        .toggle-sidebar {
+            display: none;
+            padding: 8px;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+                position: fixed;
+                left: -200px;
+                transition: left 0.3s ease;
+                z-index: 20;
+            }
+            .sidebar.active {
+                left: 0;
+            }
+            .main-content {
+                width: 100%;
+            }
+            .chat-header h1 {
+                font-size: 1.2rem;
+            }
+            .chat-header .controls {
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+            .chat-header button {
+                font-size: 0.9rem;
+                padding: 8px 12px;
+            }
+            .message-wrapper {
+                padding: 15px 20px;
+            }
+            .message {
+                font-size: 14px;
+            }
+            #user-input {
+                font-size: 14px;
+                padding: 10px 15px;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px 15px;
+            }
+            .send-button {
+                width: 40px;
+                height: 40px;
+            }
+            .toggle-sidebar {
+                display: block;
+            }
+            .image-container img {
+                max-height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Atrip AI</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li><button class="sidebar-conversations-btn"><i class="fas fa-comments"></i> Conversations</button></li>
+                <li><button class="sidebar-database-btn"><i class="fas fa-database"></i> Database</button></li>
+                <li><button class="sidebar-history-btn"><i class="fas fa-history"></i> History</button></li>
+                <li><button class="sidebar-summarize-btn"><i class="fas fa-file-alt"></i> Summarize</button></li>
+                <li><button class="sidebar-logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div class="chat-header">
+                <div class="avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h1>AI Atrip Assistant <span id="conversation-title" style="font-size: 0.9rem; color: #757575;"></span></h1>
+                <div class="controls">
+                    <button class="btn btn-outline-primary toggle-sidebar" title="Toggle Sidebar">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <button class="btn btn-outline-primary header-conversations-btn">
+                        <i class="fas fa-comments"></i> Conversations
+                    </button>
+                </div>
+            </div>
+            <div class="chat-box" id="chat-box">
+                <div class="message-wrapper">
+                    <div class="message user-message">
+                        <div class="message-avatar user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="message-content">
+                            <p>explain the step 3</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="message-wrapper">
+                    <div class="message bot-message">
+                        <div class="message-avatar bot-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            <div class="section">
+                                <div class="section-title">Step 3: Design the Cycle Route</div>
+                                <p>In this step, you’ll develop a detailed design for the cycle route, considering various aspects to ensure a safe, efficient, and enjoyable cycling experience. Here’s a breakdown of the key elements to include:</p>
+                                <ol class="procedural-list">
+                                    <li>
+                                        <strong>Route Alignment and Geometry:</strong> Determine the precise route alignment, taking into account factors like road type, traffic volume, and topography.
+                                        <ul>
+                                            <li><strong>Source:</strong> Highway Authority, Cycling Infrastructure, Page 15</li>
+                                            <li>Ensure the route is direct, convenient, and minimizes conflict with motor traffic.</li>
+                                            <li><strong>Source:</strong> Department for Transport, Cycle Infrastructure Design, Page 18</li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <strong>Cycle Lane Widths and Surfacing:</strong> Design cycle lanes with adequate widths (minimum 2 meters) and suitable surfacing materials (e.g., asphalt, concrete) to provide a comfortable riding experience.
+                                        <ul>
+                                            <li><strong>Source:</strong> Sustrans, Designing for Cyclists, Page 11</li>
+                                            <li>Consider using segregated cycle lanes, advisory lanes, or shared spaces, depending on the route’s specific needs.</li>
+                                            <li><strong>Source:</strong> Transport for West Midlands, Cycle Route Design Guide, Page 22</li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <strong>Junction and Crossing Design:</strong> Design junctions and crossings that prioritize cyclist safety and ease of use.
+                                        <ul>
+                                            <li><strong>Source:</strong> Department for Transport, Cycle Infrastructure Design, Page 20</li>
+                                            <li>Incorporate features like advanced stop lines, toucan crossings, and cycle-specific traffic signals to facilitate smooth and safe interactions between cyclists and motor traffic.</li>
+                                            <li><strong>Source:</strong> Highway Authority, Cycling Infrastructure, Page 18</li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <strong>Signage and Waymarking:</strong> Develop a clear and consistent signage strategy to guide cyclists along the route and provide wayfinding information.
+                                        <ul>
+                                            <li><strong>Source:</strong> Sustrans, Designing for Cyclists, Page 14</li>
+                                            <li><strong>Source:</strong> Transport for West Midlands, Cycle Route Design Guide, Page 26</li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <strong>Lighting and Drainage:</strong> Ensure adequate lighting is provided along the route, particularly at junctions, crossings, and areas with high conflict potential.
+                                        <ul>
+                                            <li><strong>Source:</strong> Department for Transport, Cycle Infrastructure Design, Page 22</li>
+                                            <li>Design the route to incorporate suitable drainage features, such as gullies and catch pits, to maintain a safe and clean cycling environment.</li>
+                                            <li><strong>Source:</strong> Highway Authority, Cycling Infrastructure, Page 19</li>
+                                        </ul>
+                                    </li>
+                                </ol>
+                                <p>By incorporating these design elements, you’ll create a comprehensive and well-designed cycle route that meets the needs of cyclists and supports the local community. Next, I’ll be happy to guide you through Step 4: Consult with the Stakeholders. Let me know when you’re ready!</p>
+                            </div>
+                            <div class="section">
+                                <div class="section-title">Image</div>
+                                <p>No relevant images found for this query.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="typing-indicator" id="typing-indicator">
+                <div class="message bot-message">
+                    <div class="message-avatar bot-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="typing-animation">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input">
+                <div class="file-upload">
+                    <button class="btn btn-outline-primary"><i class="fas fa-upload"></i> Upload</button>
+                    <input type="file" id="file-input" accept=".pdf,.jpg,.jpeg,.png">
+                </div>
+                <div class="input-container">
+                    <textarea id="user-input" class="form-control" placeholder="Message AI Assistant..." rows="1"></textarea>
+                </div>
+                <button class="send-button btn btn-primary">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for PDF Database -->
+    <div id="pdf-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>PDF Database</h2>
+                <span class="close pdf-modal-close">×</span>
+            </div>
+            <div class="modal-actions">
+                <input type="text" id="pdf-search-input" placeholder="Search PDFs...">
+                <button class="clear-pdfs-btn">Clear List</button>
+            </div>
+            <ul id="pdf-list" class="pdf-list"></ul>
+            <div id="pdf-pagination" class="modal-actions"></div>
+        </div>
+    </div>
+
+    <!-- Modal for Conversation History -->
+    <div id="history-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Conversation History</h2>
+                <span class="close history-modal-close">×</span>
+            </div>
+            <div class="modal-actions">
+                <input type="text" id="history-search-input" placeholder="Search history...">
+                <button class="clear-history-btn">Clear History</button>
+            </div>
+            <ul id="history-list" class="history-list"></ul>
+            <div id="history-pagination" class="modal-actions"></div>
+        </div>
+    </div>
+
+    <!-- Modal for Conversation Selection -->
+    <div id="conversation-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Select Conversation</h2>
+                <span class="close conversation-modal-close">×</span>
+            </div>
+            <div class="modal-actions">
+                <input type="text" id="conversation-search-input" placeholder="Search conversations...">
+                <button class="new-conversation-btn">New Conversation</button>
+            </div>
+            <ul id="conversation-list" class="conversation-list"></ul>
+            <div id="conversation-pagination" class="modal-actions"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        const socket = io('https://74ea-103-13-41-138.ngrok-free.app/');
+
+        socket.on('connect', () => {
+            console.log('Connected to Socket.IO server');
+        });
+
+        socket.on('connect_error', (error) => {
+            console.error('Socket.IO connection error:', error);
+            alert('Failed to connect to the server. Please check your connection and try again.');
+        });
+
+        socket.on('typing', () => {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.style.display = 'block';
+            }
+            const chatBox = document.getElementById('chat-box');
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+
+        function addBotMessage(chatBox, content, images) {
+            const messageWrapper = document.createElement('div');
+            messageWrapper.className = 'message-wrapper';
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot-message';
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'message-avatar bot-avatar';
+            avatarDiv.innerHTML = '<i class="fas fa-robot"></i>';
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+
+            const sections = [];
+            let currentSection = { title: '', content: '', isProcedural: false, isFollowUp: false };
+            const lines = content.split('\n').filter(line => line.trim());
+            let inFollowUpSection = false;
+
+            lines.forEach((line) => {
+                if (line.match(/^\*\*Follow-Up Suggestions\*\*:/i)) {
+                    if (currentSection.title || currentSection.content) sections.push({ ...currentSection });
+                    currentSection = { title: 'Follow-Up Suggestions', content: '', isFollowUp: true };
+                    inFollowUpSection = true;
+                    return;
+                }
+                if (inFollowUpSection) {
+                    currentSection.content += (currentSection.content ? '\n' : '') + line;
+                    return;
+                }
+                const stepMatch = line.match(/^Step \d+:/i);
+                const sectionMatch = line.match(/^([A-Za-z\s]+(?: to [A-Za-z\s]+)?:)/i);
+                if (stepMatch || sectionMatch) {
+                    if (currentSection.title || currentSection.content) sections.push({ ...currentSection });
+                    const title = stepMatch ? stepMatch[0] : sectionMatch[1];
+                    const isProcedural = stepMatch || line.match(/^\d+\./) || line.includes('to Engage with:');
+                    currentSection = { title: title.replace(/:$/, ''), content: line.replace(title, '').trim(), isProcedural };
+                } else if (line.match(/^\d+\./)) {
+                    currentSection.content += (currentSection.content ? '\n' : '') + line;
+                    currentSection.isProcedural = true;
+                } else {
+                    if (!currentSection.title && !currentSection.content) {
+                        currentSection = { title: '', content: line, isProcedural: false };
+                    } else {
+                        currentSection.content += (currentSection.content ? '\n' : '') + line;
+                    }
+                }
+            });
+            if (currentSection.title || currentSection.content) sections.push({ ...currentSection });
+
+            sections.forEach(section => {
+                const sectionDiv = document.createElement('div');
+                if (section.title) {
+                    const title = document.createElement('div');
+                    title.className = 'section-title';
+                    title.textContent = section.title;
+                    sectionDiv.appendChild(title);
+                }
+                if (section.isFollowUp) {
+                    sectionDiv.className = 'follow-up-suggestions';
+                    const list = document.createElement('ul');
+                    const items = section.content.split('\n').filter(item => item.trim());
+                    items.forEach(item => {
+                        const li = document.createElement('li');
+                        const itemText = item.replace(/^- /, '').trim();
+                        li.innerHTML = marked.parse(itemText);
+                        list.appendChild(li);
+                    });
+                    sectionDiv.appendChild(list);
+                } else if (section.isProcedural) {
+                    const list = document.createElement('ol');
+                    list.className = 'procedural-list';
+                    const steps = section.content.split('\n').filter(step => step.trim());
+                    steps.forEach(step => {
+                        const li = document.createElement('li');
+                        const stepText = step.replace(/^\d+\.\s*/, '').trim();
+                        li.innerHTML = marked.parse(stepText);
+                        list.appendChild(li);
+                    });
+                    sectionDiv.appendChild(list);
+                } else {
+                    const contentP = document.createElement('div');
+                    contentP.className = 'section-content';
+                    contentP.innerHTML = marked.parse(section.content || 'No response content');
+                    sectionDiv.appendChild(contentP);
+                }
+                contentDiv.appendChild(sectionDiv);
+            });
+
+            if (images && images.length > 0) {
+                const imageContainer = document.createElement('div');
+                imageContainer.className = 'image-container';
+                images.forEach((img, index) => {
+                    if (img.base64) {
+                        const imgElement = document.createElement('img');
+                        const mimeType = img.format ? `image/${img.format.toLowerCase()}` : 'image/png';
+                        imgElement.src = `data:${mimeType};base64,${img.base64}`;
+                        imgElement.alt = img.description || `Image ${index + 1}`;
+                        imageContainer.appendChild(imgElement);
+                    } else if (img.description) {
+                        const descP = document.createElement('p');
+                        descP.textContent = `Image description: ${img.description}`;
+                        imageContainer.appendChild(descP);
+                    }
+                });
+                contentDiv.appendChild(imageContainer);
+            }
+
+            messageDiv.appendChild(avatarDiv);
+            messageDiv.appendChild(contentDiv);
+            messageWrapper.appendChild(messageDiv);
+            chatBox.appendChild(messageWrapper);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            document.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
+        }
+
+        function addUserMessage(chatBox, content) {
+            const messageWrapper = document.createElement('div');
+            messageWrapper.className = 'message-wrapper';
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message user-message';
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'message-avatar user-avatar';
+            avatarDiv.innerHTML = '<i class="fas fa-user"></i>';
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.innerHTML = `<p>${content}</p>`;
+            messageDiv.appendChild(avatarDiv);
+            messageDiv.appendChild(contentDiv);
+            messageWrapper.appendChild(messageDiv);
+            chatBox.appendChild(messageWrapper);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = `${textarea.scrollHeight}px`;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('user-input');
+            const chatBox = document.getElementById('chat-box');
+            const message = input.value.trim();
+            if (message) {
+                socket.emit('message', { question: message });
+                addUserMessage(chatBox, message);
+                input.value = '';
+                autoResize(input);
+            }
+        }
+
+        function handleFileUpload(input) {
+            if (!input.files || !input.files[0]) return;
+            let file = input.files[0];
+            let userInput = document.getElementById("user-input").value.trim();
+            const chatBox = document.getElementById('chat-box');
+            
+            if (!userInput && file.type !== 'application/pdf') {
+                alert("Please enter a question before uploading a file (unless it's a PDF to add to the database).");
+                input.value = '';
+                return;
+            }
+            
+            if (file.type === 'application/pdf' && !userInput) {
+                let formData = new FormData();
+                formData.append('file', file);
+                document.getElementById("typing-indicator").style.display = "block";
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("typing-indicator").style.display = "none";
+                    if (data.status === 'exists') {
+                        addBotMessage(chatBox, data.message, []);
+                    } else if (data.status === 'success') {
+                        addBotMessage(chatBox, data.message || "PDF uploaded successfully", []);
+                    }
+                    input.value = '';
+                    loadChatHistory();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById("typing-indicator").style.display = "none";
+                    addBotMessage(chatBox, "Error uploading PDF. Please try again.", []);
+                    input.value = '';
+                });
+            } else {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    let fileContent = e.target.result.split(',')[1];
+                    addUserMessage(chatBox, `${userInput} (with file: ${file.name})`);
+                    document.getElementById("user-input").value = "";
+                    autoResize(document.getElementById("user-input"));
+                    socket.emit('file_query', {
+                        question: userInput,
+                        file_content: fileContent,
+                        file_name: file.name,
+                        file_type: file.type
+                    });
+                };
+                reader.readAsDataURL(file);
+                input.value = '';
+            }
+        }
+
+        function summarizeHistory() {
+            fetch('/summarize_history', { 
+                method: 'POST',
+                credentials: 'include'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const chatBox = document.getElementById('chat-box');
+                    if (data.status === 'success') {
+                        addBotMessage(chatBox, data.summary, []);
+                    } else {
+                        addBotMessage(chatBox, `Error summarizing history: ${data.error}`, []);
+                    }
+                })
+                .catch(error => {
+                    const chatBox = document.getElementById('chat-box');
+                    addBotMessage(chatBox, `Error summarizing history: ${error.message}`, []);
+                });
+        }
+
+        function updateConversationTitle(conversationId, name) {
+            const titleSpan = document.getElementById('conversation-title');
+            titleSpan.textContent = name ? ` - ${name} (${conversationId})` : ` - ${conversationId}`;
+        }
+
+        function loadChatHistory() {
+            fetch('/get_history', {
+                method: 'GET',
+                credentials: 'include'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const chatBox = document.getElementById('chat-box');
+                    chatBox.innerHTML = '';
+                    if (data.status === 'error') {
+                        if (data.message === 'Please log in to continue.') {
+                            alert('Session expired. Please log in again.');
+                            window.location.href = '/login';
+                            return;
+                        } else {
+                            alert(`Error: ${data.message}`);
+                            return;
+                        }
+                    }
+                    if (data.status === 'success' && data.history) {
+                        data.history.forEach(msg => {
+                            if (msg.role === 'user') {
+                                addUserMessage(chatBox, msg.content);
+                            } else {
+                                addBotMessage(chatBox, msg.content, msg.images || []);
+                            }
+                        });
+                        fetch('/get_user_conversations', { credentials: 'include' })
+                            .then(res => res.json())
+                            .then(convData => {
+                                const currentConv = convData.conversations.find(c => c.id === data.conversation_id) || convData.conversations[0];
+                                if (currentConv) updateConversationTitle(currentConv.id, currentConv.conversation_name);
+                            });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading chat history:', error);
+                    alert('Failed to load chat history. Please try again.');
+                });
+        }
+
+        function showDatabase() {
+            fetch('/list_pdfs', {
+                method: 'GET',
+                credentials: 'include'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    let pdfList = document.getElementById('pdf-list');
+                    pdfList.innerHTML = '';
+                    if (data.status === 'success' && data.pdfs && data.pdfs.length > 0) {
+                        const itemsPerPage = 5;
+                        let currentPage = 1;
+                        let filteredPDFs = [...data.pdfs];
+                        function displayPDFs(pdfs, page) {
+                            pdfList.innerHTML = '';
+                            const start = (page - 1) * itemsPerPage;
+                            const end = start + itemsPerPage;
+                            const paginatedPDFs = pdfs.slice(start, end);
+                            paginatedPDFs.forEach(pdf => {
+                                let li = document.createElement('li');
+                                let a = document.createElement('a');
+                                a.href = `/pdfs/${encodeURIComponent(pdf)}`;
+                                a.textContent = pdf;
+                                a.target = '_blank';
+                                a.rel = 'noopener noreferrer';
+                                li.appendChild(a);
+                                pdfList.appendChild(li);
+                            });
+                            updatePagination('pdf', pdfs.length, page, itemsPerPage, displayPDFs, filteredPDFs);
+                        }
+                        function searchPDFs() {
+                            const searchTerm = document.getElementById('pdf-search-input').value.toLowerCase();
+                            filteredPDFs = data.pdfs.filter(pdf => pdf.toLowerCase().includes(searchTerm));
+                            currentPage = 1;
+                            displayPDFs(filteredPDFs, currentPage);
+                        }
+                        displayPDFs(filteredPDFs, currentPage);
+                        document.getElementById('pdf-search-input').addEventListener('input', searchPDFs);
+                    } else {
+                        pdfList.innerHTML = '<li>No PDFs available in the database.</li>';
+                    }
+                    document.getElementById('pdf-modal').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    let pdfList = document.getElementById('pdf-list');
+                    pdfList.innerHTML = `<li>Error loading PDF list: ${error.message}</li>`;
+                    document.getElementById('pdf-modal').style.display = 'block';
+                });
+        }
+
+        function showHistory() {
+            fetch('/get_history', {
+                method: 'GET',
+                credentials: 'include'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    let historyList = document.getElementById('history-list');
+                    historyList.innerHTML = '';
+                    if (data.status === 'error') {
+                        if (data.message === 'Please log in to continue.') {
+                            alert('Session expired. Please log in again.');
+                            window.location.href = '/login';
+                            return;
+                        } else {
+                            historyList.innerHTML = `<li>Error: ${data.message}</li>`;
+                            document.getElementById('history-modal').style.display = 'block';
+                            return;
+                        }
+                    }
+                    if (data.status === 'success' && data.history && data.history.length > 0) {
+                        const itemsPerPage = 5;
+                        let currentPage = 1;
+                        let filteredHistory = [...data.history];
+                        let seen = new Set();
+                        filteredHistory = filteredHistory.filter(msg => {
+                            const key = `${msg.role || ''}|${msg.content || ''}`;
+                            if (seen.has(key)) return false;
+                            seen.add(key);
+                            return true;
+                        });
+                        function displayHistory(history, page) {
+                            historyList.innerHTML = '';
+                            const start = (page - 1) * itemsPerPage;
+                            const end = start + itemsPerPage;
+                            const paginatedHistory = history.slice(start, end);
+                            paginatedHistory.forEach(msg => {
+                                let li = document.createElement('li');
+                                li.className = msg.role;
+                                li.innerHTML = `<strong>${msg.role === 'user' ? 'You' : 'Assistant'} (${msg.timestamp || 'No timestamp'}):</strong> ${msg.content || 'No content'}`;
+                                historyList.appendChild(li);
+                            });
+                            updatePagination('history', history.length, page, itemsPerPage, displayHistory, filteredHistory);
+                        }
+                        function searchHistory() {
+                            const searchTerm = document.getElementById('history-search-input').value.toLowerCase();
+                            filteredHistory = data.history.filter(msg => 
+                                (msg.content && msg.content.toLowerCase().includes(searchTerm)) || 
+                                (msg.role && msg.role.toLowerCase().includes(searchTerm))
+                            );
+                            currentPage = 1;
+                            displayHistory(filteredHistory, currentPage);
+                        }
+                        displayHistory(filteredHistory, currentPage);
+                        document.getElementById('history-search-input').addEventListener('input', searchHistory);
+                    } else {
+                        historyList.innerHTML = '<li>No conversation history available.</li>';
+                    }
+                    document.getElementById('history-modal').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    let historyList = document.getElementById('history-list');
+                    historyList.innerHTML = `<li>Error loading history: ${error.message}</li>`;
+                    document.getElementById('history-modal').style.display = 'block';
+                });
+        }
+
+        function showConversations() {
+            fetch('/get_user_conversations', {
+                method: 'GET',
+                credentials: 'include'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    let conversationList = document.getElementById('conversation-list');
+                    conversationList.innerHTML = '';
+                    if (data.status === 'success' && data.conversations && data.conversations.length > 0) {
+                        const itemsPerPage = 5;
+                        let currentPage = 1;
+                        let filteredConversations = [...data.conversations];
+                        function displayConversations(conversations, page) {
+                            conversationList.innerHTML = '';
+                            const start = (page - 1) * itemsPerPage;
+                            const end = start + itemsPerPage;
+                            const paginatedConversations = conversations.slice(start, end);
+                            paginatedConversations.forEach(conv => {
+                                let li = document.createElement('li');
+                                li.dataset.conversationId = conv.id;
+                                li.innerHTML = `
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>${conv.conversation_name} (${new Date(conv.created_at).toLocaleString()})</span>
+                                        <div>
+                                            <button class="rename-btn btn btn-sm btn-outline-primary" data-id="${conv.id}">Rename</button>
+                                            <button class="delete-btn btn btn-sm btn-outline-danger" data-id="${conv.id}">Delete</button>
+                                        </div>
+                                    </div>`;
+                                li.addEventListener('click', (e) => {
+                                    if (!e.target.classList.contains('rename-btn') && !e.target.classList.contains('delete-btn')) {
+                                        selectConversation(conv.id);
+                                    }
+                                });
+                                conversationList.appendChild(li);
+                            });
+                            updatePagination('conversation', conversations.length, page, itemsPerPage, displayConversations, filteredConversations);
+                            document.querySelectorAll('.rename-btn').forEach(btn => {
+                                btn.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    const id = btn.dataset.id;
+                                    const newName = prompt('Enter new conversation name:');
+                                    if (newName) renameConversation(id, newName);
+                                });
+                            });
+                            document.querySelectorAll('.delete-btn').forEach(btn => {
+                                btn.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    const id = btn.dataset.id;
+                                    if (confirm('Are you sure you want to delete this conversation?')) {
+                                        deleteConversation(id);
+                                    }
+                                });
+                            });
+                        }
+                        function searchConversations() {
+                            const searchTerm = document.getElementById('conversation-search-input').value.toLowerCase();
+                            filteredConversations = data.conversations.filter(conv => 
+                                conv.conversation_name.toLowerCase().includes(searchTerm)
+                            );
+                            currentPage = 1;
+                            displayConversations(filteredConversations, currentPage);
+                        }
+                        displayConversations(filteredConversations, currentPage);
+                        document.getElementById('conversation-search-input').addEventListener('input', searchConversations);
+                    } else {
+                        conversationList.innerHTML = '<li>No conversations available.</li>';
+                    }
+                    document.getElementById('conversation-modal').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    let conversationList = document.getElementById('conversation-list');
+                    conversationList.innerHTML = `<li>Error loading conversations: ${error.message}</li>`;
+                    document.getElementById('conversation-modal').style.display = 'block';
+                });
+        }
+
+        function selectConversation(conversationId) {
+            fetch(`/select_conversation/${conversationId}`, {
+                method: 'POST',
+                credentials: 'include'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        loadChatHistory();
+                        document.getElementById('conversation-modal').style.display = 'none';
+                    } else {
+                        alert(`Error selecting conversation: ${data.message}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert(`Error selecting conversation: ${error.message}`);
+                });
+        }
+
+        function renameConversation(conversationId, newName) {
+            const formData = new FormData();
+            formData.append('new_name', newName);
+            fetch(`/rename_conversation/${conversationId}`, {
+                method: 'POST',
+                body: formData,
+                credentials: 'include'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showConversations();
+                    } else {
+                        alert(`Error renaming conversation: ${data.message}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert(`Error renaming conversation: ${error.message}`);
+                });
+        }
+
+        function deleteConversation(conversationId) {
+            fetch(`/delete_conversation/${conversationId}`, {
+                method: 'POST',
+                credentials: 'include'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showConversations();
+                        loadChatHistory();
+                    } else {
+                        alert(`Error deleting conversation: ${data.message}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert(`Error deleting conversation: ${error.message}`);
+                });
+        }
+
+        function updatePagination(type, totalItems, currentPage, itemsPerPage, displayFunc, items) {
+            const paginationDiv = document.getElementById(`${type}-pagination`);
+            paginationDiv.innerHTML = '';
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            if (totalPages <= 1) return;
+            const prevButton = document.createElement('button');
+            prevButton.textContent = 'Previous';
+            prevButton.disabled = currentPage === 1;
+            prevButton.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayFunc(items, currentPage);
+                }
+            });
+            paginationDiv.appendChild(prevButton);
+            const nextButton = document.createElement('button');
+            nextButton.textContent = 'Next';
+            nextButton.disabled = currentPage === totalPages;
+            nextButton.addEventListener('click', () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    displayFunc(items, currentPage);
+                }
+            });
+            paginationDiv.appendChild(nextButton);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const input = document.getElementById('user-input');
+            const sendButton = document.querySelector('.send-button');
+            const fileInput = document.getElementById('file-input');
+            const pdfModal = document.getElementById('pdf-modal');
+            const historyModal = document.getElementById('history-modal');
+            const conversationModal = document.getElementById('conversation-modal');
+            const pdfClose = document.querySelector('.pdf-modal-close');
+            const historyClose = document.querySelector('.history-modal-close');
+            const conversationClose = document.querySelector('.conversation-modal-close');
+            const databaseBtn = document.querySelector('.sidebar-database-btn');
+            const historyBtn = document.querySelector('.sidebar-history-btn');
+            const conversationsBtn = document.querySelector('.sidebar-conversations-btn');
+            const headerConversationsBtn = document.querySelector('.header-conversations-btn');
+            const summarizeBtn = document.querySelector('.sidebar-summarize-btn');
+            const logoutBtn = document.querySelector('.sidebar-logout-btn');
+            const toggleSidebarBtn = document.querySelector('.toggle-sidebar');
+            const sidebar = document.querySelector('.sidebar');
+
+            loadChatHistory();
+
+            input.addEventListener('input', () => autoResize(input));
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            sendButton.addEventListener('click', sendMessage);
+            fileInput.addEventListener('change', () => handleFileUpload(fileInput));
+
+            databaseBtn.addEventListener('click', showDatabase);
+            historyBtn.addEventListener('click', showHistory);
+            conversationsBtn.addEventListener('click', showConversations);
+            headerConversationsBtn.addEventListener('click', showConversations);
+            summarizeBtn.addEventListener('click', summarizeHistory);
+            logoutBtn.addEventListener('click', () => window.location.href = '/logout');
+
+            toggleSidebarBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+
+            pdfClose.addEventListener('click', () => pdfModal.style.display = 'none');
+            historyClose.addEventListener('click', () => historyModal.style.display = 'none');
+            conversationClose.addEventListener('click', () => conversationModal.style.display = 'none');
+
+            window.addEventListener('click', (e) => {
+                if (e.target === pdfModal) pdfModal.style.display = 'none';
+                if (e.target === historyModal) historyModal.style.display = 'none';
+                if (e.target === conversationModal) conversationModal.style.display = 'none';
+            });
+
+            document.querySelector('.new-conversation-btn').addEventListener('click', () => {
+                fetch('/new_chat', {
+                    method: 'POST',
+                    credentials: 'include'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            loadChatHistory();
+                            showConversations();
+                        } else {
+                            alert(`Error creating new conversation: ${data.message}`);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert(`Error creating new conversation: ${error.message}`);
+                    });
+            });
+
+            socket.on('message', data => {
+                const chatBox = document.getElementById('chat-box');
+                const typingIndicator = document.getElementById('typing-indicator');
+                typingIndicator.style.display = 'none';
+                if (data.status === 'complete') {
+                    addBotMessage(chatBox, data.response, data.images || []);
+                } else if (data.status === 'error') {
+                    if (data.requires_login) {
+                        alert('Session expired. Please log in again.');
+                        window.location.href = '/login';
+                    } else {
+                        addBotMessage(chatBox, `Error: ${data.response}`, []);
+                    }
+                } else {
+                    console.warn('Unexpected message status:', data.status);
+                    addBotMessage(chatBox, 'Unexpected response from server. Please try again.', []);
+                }
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+        });
+    </script>
+</body>
+</html>
